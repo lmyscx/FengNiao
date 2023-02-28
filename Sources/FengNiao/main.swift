@@ -28,6 +28,7 @@ import CommandLineKit
 import Rainbow
 import FengNiaoKit
 import PathKit
+import AppKit
 
 let appVersion = "0.8.1"
 
@@ -153,13 +154,30 @@ if !isForce {
         result = promptResult(files: unusedFiles)
     }
     
+    var total = ""
+    
     switch result {
     case .list:
         fatalError()
     case .delete:
         break
     case .ignore:
+        for file in unusedFiles.sorted(by: { $0.size > $1.size }) {
+//            print("\(file.readableSize) \(file.path.string)")
+            if !file.fileName.hasPrefix("t1_") {
+                total = total.appendingFormat("%@\n", file.fileName)
+            }
+        }
+        print(total)
         print("Ignored. Nothing to do, bye!".green.bold)
+
+        let path = "/Volumes/data/workspace/ToolPath/1.txt"
+        do {
+            try total.write(to: URL(fileURLWithPath:path), atomically: true, encoding: .utf8)
+        }catch {
+            print(error.localizedDescription)
+        }
+        
         exit(EX_OK)
     }
 }
